@@ -37,41 +37,37 @@ const NetworkGraphPlaceholder = styled.div`
   align-items: center;
 `;
 
-// Handle on the left side of the screen that opens an offcanvas
-const OffcanvasHandle = styled.div`
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translate(100%, -50%);
-  background-color: #f8f9fa;
-  padding: 0.5rem;
-  border-radius: 0 0.25rem 0.25rem 0;
-  border: 1px solid #ced4da;
-  border-right: 0;
-  cursor: pointer;
-  z-index: 1051;
-`;
-
 function App() {
 
-  const [show, setShow] = useState(true);
+  const [isLeftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [isRightPanelOpen, setRightPanelOpen] = useState(true);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  return (
-    <>
-      <Offcanvas show={show} onHide={handleClose} backdrop={false}>
+  const LeftPanel = () => (
+    <Offcanvas show={isLeftPanelOpen} onHide={() => setLeftPanelOpen(false)} backdrop={false}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Offcanvas</Offcanvas.Title>
+          <Offcanvas.Title>Left Panel</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           Some text as placeholder
         </Offcanvas.Body>
-        <OffcanvasHandle onClick={handleShow}>
-        &gt;
-        </OffcanvasHandle>
       </Offcanvas>
+  );
+
+  const RightPanel = () => (
+    <Offcanvas show={isRightPanelOpen} onHide={() => setRightPanelOpen(false)} placement="end" backdrop={false}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Right Panel</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          Some text as placeholder
+        </Offcanvas.Body>
+      </Offcanvas>
+  );
+
+  return (
+    <>
+      <LeftPanel />
+      <RightPanel />
       <FullHeightSeemlessColumnContainer>
         <TimelinePlaceholder>
           Timeline
