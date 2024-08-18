@@ -3,6 +3,8 @@ import './App.css';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import { LETTERS } from './mockData';
+import NetworkGraph from './NetworkGraph';
 
 // Container that takes up the full height of the viewport, with no padding or margin, and places its children in a column
 const FullHeightSeemlessColumnContainer = styled(Container)`
@@ -37,10 +39,35 @@ const NetworkGraphPlaceholder = styled.div`
   align-items: center;
 `;
 
+const TIMELINE_HEIGHT = 200;
+
 function App() {
 
-  const [isLeftPanelOpen, setLeftPanelOpen] = useState(true);
-  const [isRightPanelOpen, setRightPanelOpen] = useState(true);
+  const [isLeftPanelOpen, setLeftPanelOpen] = useState(false);
+  const [isRightPanelOpen, setRightPanelOpen] = useState(false);
+
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
+  const [selectedRelationship, setSelectedRelationship] = useState(null);
+
+  const [data, setData] = useState(LETTERS);
+
+  // The left panel should be open when there is a selected author
+  useEffect(() => {
+    if (selectedAuthor) {
+      setLeftPanelOpen(true);
+    } else {
+      setLeftPanelOpen(false);
+    }
+  }, [selectedAuthor]);
+
+  // The right panel should be open when there is a selected relationship
+  useEffect(() => {
+    if (selectedRelationship) {
+      setRightPanelOpen(true);
+    } else {
+      setRightPanelOpen(false);
+    }
+  }, [selectedRelationship]);
 
   const LeftPanel = () => (
     <Offcanvas show={isLeftPanelOpen} onHide={() => setLeftPanelOpen(false)} backdrop={false}>
@@ -64,6 +91,32 @@ function App() {
       </Offcanvas>
   );
 
+  const html = document.documentElement;
+
+  // Get the width of the window and update it when the window is resized
+  const [windowWidth, setWindowWidth] = useState(html.clientWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(html.clientWidth);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
+  });
+
+  // Get the height of the window and update it when the window is resized
+  const [windowHeight, setWindowHeight] = useState(html.clientHeight);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(html.clientHeight);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
+  });
+
   return (
     <>
       <LeftPanel />
@@ -72,9 +125,13 @@ function App() {
         <TimelinePlaceholder>
           Timeline
         </TimelinePlaceholder>
-        <NetworkGraphPlaceholder>
-          Network Graph
-        </NetworkGraphPlaceholder>
+        <NetworkGraph
+          data={data}
+          selectedAuthorState={{ selectedAuthor, setSelectedAuthor }}
+          selectedRelationshipState={{ selectedRelationship, setSelectedRelationship }}
+          width={windowWidth}
+          height={windowHeight - TIMELINE_HEIGHT}
+        />
       </FullHeightSeemlessColumnContainer>
     </>
     
