@@ -23,6 +23,8 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
 
   const padding = 75;
 
+  let tooltip = useRef(null);
+
   // Run once
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -33,6 +35,17 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
 
     // Create brush
     svg.append("g").attr("class", BRUSH_GROUP);
+
+    // Create tooltip
+    tooltip.current = d3.select("body").append("div")
+    .attr("class", "timeline-tooltip")
+    .style("position", "absolute")
+    .style("visibility", "hidden")
+    .style("background", "lightgray")
+    .style("border", "1px solid #ccc")
+    .style("padding", "5px")
+    .style("border-radius", "4px")
+    .style("box-shadow", "0 0 10px rgba(0,0,0,0.1)");
   });
 
   // On update
@@ -72,7 +85,18 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
       .attr("class", "layer")
       .merge(layers) // Merge the entered elements with the existing ones
       .attr("fill", d => color(d.key))
-      .attr("d", area);
+      .attr("d", area)
+      .on("mouseover", (event, d) => {
+        tooltip.current.style("visibility", "visible")
+          .text(d.key);
+      })
+      .on("mousemove", (event) => {
+        tooltip.current.style("top", (event.pageY - 10) + "px")
+          .style("left", (event.pageX + 10) + "px");
+      })
+      .on("mouseout", () => {
+        tooltip.current.style("visibility", "hidden");
+      });
     
     // Remove any paths that no longer exist in the data
     layers.exit().remove();
