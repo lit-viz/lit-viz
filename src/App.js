@@ -27,6 +27,8 @@ const TIMELINE_HEIGHT = 200;
 
 function App() {
 
+  const DEFAULT_TIME_SELECTION = d3.extent(timelineData, d => d.date);
+
   const [isLeftPanelOpen, setLeftPanelOpen] = useState(false);
   const [isRightPanelOpen, setRightPanelOpen] = useState(false);
 
@@ -34,7 +36,7 @@ function App() {
   const [selectedRelationship, setSelectedRelationship] = useState(null);
 
   // Timeline selection
-  const [timeSelection, setTimeSelection] = useState(d3.extent(timelineData, d => d.date));
+  const [timeSelection, setTimeSelection] = useState(DEFAULT_TIME_SELECTION);
 
   const [data, setData] = useState(LETTERS);
 
@@ -106,7 +108,12 @@ function App() {
 
   // The data should be filtered according to the selected time range
   useEffect(() => {
-    setData(LETTERS.filter(letter => letter.date >= timeSelection[0] && letter.date <= timeSelection[1]));
+    console.log(timeSelection);
+    if (!timeSelection) {
+      setData(LETTERS);
+    } else {
+      setData(LETTERS.filter(letter => timeSelection[0] <= letter.date && letter.date <= timeSelection[1]));
+    }
   }, [timeSelection]);
 
   return (
@@ -119,6 +126,7 @@ function App() {
           width={windowWidth}
           height={TIMELINE_HEIGHT}
           selection={timeSelection}
+          default_selection={DEFAULT_TIME_SELECTION}
           setSelection={setTimeSelection}
         />
         <NetworkGraph

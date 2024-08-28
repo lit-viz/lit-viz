@@ -17,7 +17,7 @@ function calculateNumTicks(data) {
   return max;
 }
 
-const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, setSelection }) => {
+const Timeline = ({ data, width: outerWidth, height: outerHeight, default_selection, selection, setSelection }) => {
   const svgRef = useRef(null);
 
   const getNonDateMax = (data) => {
@@ -133,13 +133,15 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
 
     // Brush event handler function
     function brushed(event) {
-      const selection = event.selection;
+      const newSelection = event.selection;
       // Handle the brush event here
       // For example, you could update another chart based on the selection
       // or filter data displayed on the current chart
-      if (selection) {
-        const [x0, x1] = selection.map(xScale.invert);
+      if (newSelection) {
+        const [x0, x1] = newSelection.map(xScale.invert);
         setSelection([x0, x1]);
+      } else {
+        setSelection(default_selection);
       }
     }
 
