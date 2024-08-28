@@ -152,7 +152,7 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
     svg.select(`.${BRUSH_GROUP}`)
       .call(brush);
 
-  }, [data, outerHeight, outerWidth, selection, setSelection]);
+  }, [MARGINS.bottom, MARGINS.left, MARGINS.right, MARGINS.top, data, outerHeight, outerWidth, selection, setSelection]);
 
   return (
     <svg
