@@ -62,6 +62,7 @@ function App() {
       setRightPanelOpen(false);
     }
   }, [selectedRelationship]);
+  
   // Timeline selection
   const [timeSelection, setTimeSelection] = useState(d3.extent(timelineData, d => d.date));
 
