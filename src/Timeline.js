@@ -6,6 +6,17 @@ const X_AXIS_GROUP = 'x-axis';
 const Y_AXIS_GROUP = 'y-axis';
 const BRUSH_GROUP = 'brush';
 
+function calculateNumTicks(data) {
+  let max = 0;
+  data.forEach(d => {
+    const sum = Object.keys(d).reduce((acc, key) => {
+      return key !== 'date' ? acc + d[key] : acc;
+    }, 0);
+    max = Math.max(max, sum);
+  });
+  return max;
+}
+
 const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, setSelection }) => {
   const svgRef = useRef(null);
 
@@ -21,7 +32,12 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
     return max;
   }
 
-  const padding = 75;
+  const MARGINS = {
+    top: 20,
+    right: 20,
+    bottom: 20,
+    left: 25,
+  }
 
   let tooltip = useRef(null);
 
@@ -52,17 +68,17 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
   useEffect(() => {
     const svg = d3.select(svgRef.current);
 
-    const height = outerHeight - padding;
-    const width = outerWidth - padding;
+    const height = outerHeight - MARGINS.top - MARGINS.bottom;
+    const width = outerWidth - MARGINS.left - MARGINS.right;
 
     // Create scales
     const xScale = d3.scaleTime()
       .domain(d3.extent(data, d => d.date))
-      .range([0, width]);
+      .range([MARGINS.left, width-MARGINS.right]);
 
     const yScale = d3.scaleLinear()
       .domain([0, getNonDateMax(data)])
-      .range([height, 0]);
+      .range([height-MARGINS.bottom, MARGINS.top]);
 
     // Stack the data
     const stack = d3.stack().keys(Object.keys(data[0]).filter(key => key !== 'date'));
@@ -103,13 +119,17 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
 
     // Create the axes
     const xAxis = d3.axisBottom(xScale);
-    const yAxis = d3.axisLeft(yScale);
+    const yAxis = d3.axisLeft(yScale)
+      .ticks(calculateNumTicks(data))
+      .tickFormat(d3.format("d")); // Format ticks as whole numbers
 
     // Draw the axes
     svg.select(`.${X_AXIS_GROUP}`)
-      .attr("transform", `translate(0, ${height})`)
+      .attr("transform", `translate(0, ${height-MARGINS.bottom})`)
       .call(xAxis);
-    svg.select(`.${Y_AXIS_GROUP}`).call(yAxis);
+    svg.select(`.${Y_AXIS_GROUP}`)
+      .attr("transform", `translate(${MARGINS.left}, 0)`)
+      .call(yAxis);
 
     // Brush event handler function
     function brushed(event) {
@@ -139,7 +159,7 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
       ref={svgRef}
       width={outerWidth}
       height={outerHeight}
-      transform={`translate(${padding / 2}, ${padding / 4})`}
+      transform={`translate(${MARGINS.left}, ${MARGINS.top})`}
     />);
 };
 
