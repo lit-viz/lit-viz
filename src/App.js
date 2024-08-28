@@ -23,8 +23,6 @@ const FullHeightSeemlessColumnContainer = styled(Container)`
 // Generate data for the timeline, spanning from 1900 to 1930 with one datapoint for each quarter
 const timelineData = calculateNumLettersSentByMonthByAuthor(LETTERS);
 
-console.log(timelineData);
-
 const TIMELINE_HEIGHT = 200;
 
 function App() {
