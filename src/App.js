@@ -3,6 +3,8 @@ import './App.css';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import Timeline from './Timeline';
+import * as d3 from 'd3';
 
 // Container that takes up the full height of the viewport, with no padding or margin, and places its children in a column
 const FullHeightSeemlessColumnContainer = styled(Container)`
@@ -37,10 +39,26 @@ const NetworkGraphPlaceholder = styled.div`
   align-items: center;
 `;
 
+// Generate data for the timeline, spanning from 1900 to 1930 with one datapoint for each quarter
+const timelineData = [];
+for (let year = 1900; year <= 1930; year++) {
+  for (let month = 1; month <= 12; month++) {
+    timelineData.push({
+      date: new Date(`${year}-${month}-01`),
+      a: Math.random() * 100,
+      b: Math.random() * 100,
+      c: Math.random() * 100,
+    });
+  }
+}
+
 function App() {
 
-  const [isLeftPanelOpen, setLeftPanelOpen] = useState(true);
-  const [isRightPanelOpen, setRightPanelOpen] = useState(true);
+  const [isLeftPanelOpen, setLeftPanelOpen] = useState(false);
+  const [isRightPanelOpen, setRightPanelOpen] = useState(false);
+
+  // Timeline selection
+  const [timeSelection, setTimeSelection] = useState(d3.extent(timelineData, d => d.date));
 
   const LeftPanel = () => (
     <Offcanvas show={isLeftPanelOpen} onHide={() => setLeftPanelOpen(false)} backdrop={false}>
@@ -64,14 +82,40 @@ function App() {
       </Offcanvas>
   );
 
+  const html = document.documentElement;
+
+  // Get the width of the window and update it when the window is resized
+  const [windowWidth, setWindowWidth] = useState(html.clientWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(html.clientWidth);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
+  });
+
+  const TimeSelection = () => (
+    <div>
+      <p>Selected time range:</p>
+      <p>{timeSelection[0].toDateString()} to {timeSelection[1].toDateString()}</p>
+    </div>
+  );
+
   return (
     <>
       <LeftPanel />
       <RightPanel />
       <FullHeightSeemlessColumnContainer>
-        <TimelinePlaceholder>
-          Timeline
-        </TimelinePlaceholder>
+        <Timeline
+          data={timelineData}
+          width={windowWidth}
+          height={200}
+          selection={timeSelection}
+          setSelection={setTimeSelection}
+        />
+        <TimeSelection />
         <NetworkGraphPlaceholder>
           Network Graph
         </NetworkGraphPlaceholder>
