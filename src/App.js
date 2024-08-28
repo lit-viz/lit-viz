@@ -3,6 +3,8 @@ import './App.css';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import { LETTERS, calculateNumLettersSentByMonthByAuthor } from './mockData';
+import NetworkGraph from './NetworkGraph';
 import Timeline from './Timeline';
 import * as d3 from 'd3';
 
@@ -18,47 +20,43 @@ const FullHeightSeemlessColumnContainer = styled(Container)`
   max-width: 100vw !important;
 `;
 
-const TimelinePlaceholder = styled.div`
-  height: 200px; // Fixed height for the timeline
-  background-color: #969696;
-  
-  // for the placeholder text:
-  text-align: center;
-  line-height: 200px;
-`;
-
-const NetworkGraphPlaceholder = styled.div`
-  flex-grow: 1; // Take up remaining space left over from timeline
-  background-color: #d4d4d4;
-
-  // for the placeholder text:
-  text-align: center;
-  // vertically align the placeholder text
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 // Generate data for the timeline, spanning from 1900 to 1930 with one datapoint for each quarter
-const timelineData = [];
-for (let year = 1900; year <= 1930; year++) {
-  for (let month = 1; month <= 12; month++) {
-    timelineData.push({
-      date: new Date(`${year}-${month}-01`),
-      a: Math.random() * 100,
-      b: Math.random() * 100,
-      c: Math.random() * 100,
-    });
-  }
-}
+const timelineData = calculateNumLettersSentByMonthByAuthor(LETTERS);
+
+const TIMELINE_HEIGHT = 200;
 
 function App() {
+
+  const DEFAULT_TIME_SELECTION = d3.extent(timelineData, d => d.date);
 
   const [isLeftPanelOpen, setLeftPanelOpen] = useState(false);
   const [isRightPanelOpen, setRightPanelOpen] = useState(false);
 
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
+  const [selectedRelationship, setSelectedRelationship] = useState(null);
+
   // Timeline selection
-  const [timeSelection, setTimeSelection] = useState(d3.extent(timelineData, d => d.date));
+  const [timeSelection, setTimeSelection] = useState(DEFAULT_TIME_SELECTION);
+
+  const [data, setData] = useState(LETTERS);
+
+  // The left panel should be open when there is a selected author
+  useEffect(() => {
+    if (selectedAuthor) {
+      setLeftPanelOpen(true);
+    } else {
+      setLeftPanelOpen(false);
+    }
+  }, [selectedAuthor]);
+
+  // The right panel should be open when there is a selected relationship
+  useEffect(() => {
+    if (selectedRelationship) {
+      setRightPanelOpen(true);
+    } else {
+      setRightPanelOpen(false);
+    }
+  }, [selectedRelationship]);
 
   const LeftPanel = () => (
     <Offcanvas show={isLeftPanelOpen} onHide={() => setLeftPanelOpen(false)} backdrop={false}>
@@ -96,12 +94,27 @@ function App() {
     }
   });
 
-  const TimeSelection = () => (
-    <div>
-      <p>Selected time range:</p>
-      <p>{timeSelection[0].toDateString()} to {timeSelection[1].toDateString()}</p>
-    </div>
-  );
+  // Get the height of the window and update it when the window is resized
+  const [windowHeight, setWindowHeight] = useState(html.clientHeight);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(html.clientHeight);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
+  });
+
+  // The data should be filtered according to the selected time range
+  useEffect(() => {
+    console.log(timeSelection);
+    if (!timeSelection) {
+      setData(LETTERS);
+    } else {
+      setData(LETTERS.filter(letter => timeSelection[0] <= letter.date && letter.date <= timeSelection[1]));
+    }
+  }, [timeSelection]);
 
   return (
     <>
@@ -111,14 +124,18 @@ function App() {
         <Timeline
           data={timelineData}
           width={windowWidth}
-          height={200}
+          height={TIMELINE_HEIGHT}
           selection={timeSelection}
+          default_selection={DEFAULT_TIME_SELECTION}
           setSelection={setTimeSelection}
         />
-        <TimeSelection />
-        <NetworkGraphPlaceholder>
-          Network Graph
-        </NetworkGraphPlaceholder>
+        <NetworkGraph
+          data={data}
+          selectedAuthorState={{ selectedAuthor, setSelectedAuthor }}
+          selectedRelationshipState={{ selectedRelationship, setSelectedRelationship }}
+          width={windowWidth}
+          height={windowHeight - TIMELINE_HEIGHT}
+        />
       </FullHeightSeemlessColumnContainer>
     </>
     
