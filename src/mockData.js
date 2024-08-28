@@ -186,6 +186,15 @@ export const LETTERS = [
     sender: 'Alice Johnson',
     recipient: 'Emily Davis',
     length_words: 500,
+    date: new Date('1891-01-05'),
+    sentiment: 0.3,
+    raw_text: 'Lorem ipsum dolor',
+    annotations: []
+  },
+  {
+    sender: 'Alice Johnson',
+    recipient: 'Emily Davis',
+    length_words: 500,
     date: new Date('1890-03-05'),
     sentiment: 0.5,
     raw_text: 'Lorem ipsum dolor',
@@ -197,6 +206,24 @@ export const LETTERS = [
     length_words: 500,
     date: new Date('1890-02-05'),
     sentiment: 0.25,
+    raw_text: 'Lorem ipsum dolor',
+    annotations: []
+  },
+  {
+    sender: 'Alice Johnson',
+    recipient: 'Emily Davis',
+    length_words: 500,
+    date: new Date('1891-02-05'),
+    sentiment: 0.25,
+    raw_text: 'Lorem ipsum dolor',
+    annotations: []
+  },
+  {
+    sender: 'Alice Johnson',
+    recipient: 'Emily Davis',
+    length_words: 500,
+    date: new Date('1891-02-05'),
+    sentiment: 0.8,
     raw_text: 'Lorem ipsum dolor',
     annotations: []
   },
