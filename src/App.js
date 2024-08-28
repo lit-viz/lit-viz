@@ -33,6 +33,9 @@ function App() {
   const [selectedAuthor, setSelectedAuthor] = useState(null);
   const [selectedRelationship, setSelectedRelationship] = useState(null);
 
+  // Timeline selection
+  const [timeSelection, setTimeSelection] = useState(d3.extent(timelineData, d => d.date));
+
   const [data, setData] = useState(LETTERS);
 
   // The left panel should be open when there is a selected author
@@ -52,9 +55,6 @@ function App() {
       setRightPanelOpen(false);
     }
   }, [selectedRelationship]);
-
-  // Timeline selection
-  const [timeSelection, setTimeSelection] = useState(d3.extent(timelineData, d => d.date));
 
   const LeftPanel = () => (
     <Offcanvas show={isLeftPanelOpen} onHide={() => setLeftPanelOpen(false)} backdrop={false}>
@@ -103,6 +103,11 @@ function App() {
       window.removeEventListener('resize', handleResize);
     }
   });
+
+  // The data should be filtered according to the selected time range
+  useEffect(() => {
+    setData(LETTERS.filter(letter => letter.date >= timeSelection[0] && letter.date <= timeSelection[1]));
+  }, [timeSelection]);
 
   return (
     <>
