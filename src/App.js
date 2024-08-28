@@ -20,27 +20,6 @@ const FullHeightSeemlessColumnContainer = styled(Container)`
   max-width: 100vw !important;
 `;
 
-const TimelinePlaceholder = styled.div`
-  height: 200px; // Fixed height for the timeline
-  background-color: #969696;
-  
-  // for the placeholder text:
-  text-align: center;
-  line-height: 200px;
-`;
-
-const NetworkGraphPlaceholder = styled.div`
-  flex-grow: 1; // Take up remaining space left over from timeline
-  background-color: #d4d4d4;
-
-  // for the placeholder text:
-  text-align: center;
-  // vertically align the placeholder text
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 // Generate data for the timeline, spanning from 1900 to 1930 with one datapoint for each quarter
 const timelineData = [];
 for (let year = 1900; year <= 1930; year++) {
