@@ -3,7 +3,7 @@ import './App.css';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { LETTERS } from './mockData';
+import { LETTERS, calculateNumLettersSentByMonthByAuthor } from './mockData';
 import NetworkGraph from './NetworkGraph';
 import Timeline from './Timeline';
 import * as d3 from 'd3';
@@ -21,17 +21,9 @@ const FullHeightSeemlessColumnContainer = styled(Container)`
 `;
 
 // Generate data for the timeline, spanning from 1900 to 1930 with one datapoint for each quarter
-const timelineData = [];
-for (let year = 1900; year <= 1930; year++) {
-  for (let month = 1; month <= 12; month++) {
-    timelineData.push({
-      date: new Date(`${year}-${month}-01`),
-      a: Math.random() * 100,
-      b: Math.random() * 100,
-      c: Math.random() * 100,
-    });
-  }
-}
+const timelineData = calculateNumLettersSentByMonthByAuthor(LETTERS);
+
+console.log(timelineData);
 
 const TIMELINE_HEIGHT = 200;
 
@@ -62,7 +54,7 @@ function App() {
       setRightPanelOpen(false);
     }
   }, [selectedRelationship]);
-  
+
   // Timeline selection
   const [timeSelection, setTimeSelection] = useState(d3.extent(timelineData, d => d.date));
 

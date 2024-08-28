@@ -52,7 +52,7 @@ const Timeline = ({ data, width: outerWidth, height: outerHeight, selection, set
       .range([height, 0]);
 
     // Stack the data
-    const stack = d3.stack().keys(["a", "b", "c"]);
+    const stack = d3.stack().keys(Object.keys(data[0]).filter(key => key !== 'date'));
     const series = stack(data);
 
     // Define the color scale
